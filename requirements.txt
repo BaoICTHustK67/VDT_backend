@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 flask-cors
 psycopg2-binary
 prometheus_flask_exporter
+flask_limiter
