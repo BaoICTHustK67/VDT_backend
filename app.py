@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from flask_cors import CORS
 from prometheus_flask_exporter import PrometheusMetrics
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
 
 app = Flask(__name__)
@@ -31,6 +33,16 @@ class Student(db.Model):
     
 with app.app_context():    
     db.create_all()
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["10 per minute"]
+)
+
+@app.errorhandler(429)
+def ratelimit_error(e):
+    return jsonify(error="ratelimit exceeded", message=str(e.description)), 409
 
 @app.route('/')
 def hello_world():
